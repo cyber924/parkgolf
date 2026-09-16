@@ -1,6 +1,6 @@
 {
-  "name": "ParkGolfOne AI - 파크골프 & 라이프스타일 공식 매거진",
-  "description": "ParkGolfOne AI 공식 매거진 • 파크골프 코스, 장비 리뷰, 스윙 꿀팁, 최신 팩트 뉴스 및 생활 트렌드를 담은 프리미엄 웹진",
+  "name": "파크골프원 (ParkGolfOne) - 대한민국 1등 파크골프 & 라이프스타일 공식 웹진",
+  "description": "전국 파크골프장 코스 공략 가이드, 장비 및 클럽 추천, 아마추어 타수 줄이기 레슨 팁, 시니어 건강 및 실시간 라이프스타일 공식 웹진 파크골프원(parkgolfone.co.kr).",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -10,6 +10,8 @@ import {
   UserPlus,
   Layers,
   LayoutDashboard,
+  Menu,
+  X,
 } from 'lucide-react';
 import { CATEGORIES } from '../data/categories';
 import { CategoryId, ViewMode } from '../types';
@@ -43,6 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuth,
 }) => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isAdmin = isUserAdmin(currentUser);
 
   const handleLogout = async () => {
@@ -84,8 +87,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right Action Menu */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* View Mode Nav */}
-            <nav className="flex items-center bg-[#16161A] p-1 rounded-xl border border-[#27272A]">
+            {/* View Mode Nav - Hidden on mobile, shown on md and above */}
+            <nav className="hidden md:flex items-center bg-[#16161A] p-1 rounded-xl border border-[#27272A]">
               <button
                 id="nav-webzine-btn"
                 onClick={() => onSelectView('webzine')}
@@ -140,12 +143,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </nav>
 
-            {/* AI Generate Action Button (Logged-in only) */}
+            {/* AI Generate Action Button (Logged-in only) - Hidden on mobile, shown on md and above */}
             {currentUser && (
               <button
                 id="nav-create-post-btn"
                 onClick={onOpenQuickGenerator}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 active:scale-98 transition cursor-pointer"
+                className="hidden md:flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 active:scale-98 transition cursor-pointer"
               >
                 <PenTool className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">AI 새 글 작성</span>
@@ -155,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* User Auth Section (Login / Sign Up / Profile) */}
             {currentUser ? (
-              <div className="relative">
+              <div className="relative hidden md:block">
                 <button
                   id="nav-user-profile-btn"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
@@ -244,7 +247,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-1.5">
+              <div className="hidden md:flex items-center gap-1.5">
                 <button
                   id="nav-login-btn"
                   onClick={() => onOpenAuth('login')}
@@ -256,16 +259,180 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   id="nav-signup-btn"
                   onClick={() => onOpenAuth('signup')}
-                  className="hidden sm:flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/50 transition cursor-pointer"
+                  className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/50 transition cursor-pointer"
                 >
                   <UserPlus className="w-3.5 h-3.5 text-indigo-300" />
                   <span>회원가입</span>
                 </button>
               </div>
             )}
+
+            {/* Mobile Hamburger Menu Toggle Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex md:hidden items-center justify-center w-10 h-10 rounded-xl bg-[#16161A] hover:bg-[#222228] border border-[#27272A] text-zinc-400 hover:text-white transition cursor-pointer"
+              aria-label="메뉴 열기"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Expandable Slide-down Menu Panel */}
+      {mobileMenuOpen && (
+        <>
+          {/* Backdrop overlay */}
+          <div
+            className="fixed inset-0 top-[65px] z-30 bg-black/70 backdrop-blur-xs md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          {/* Menu Drawer */}
+          <div className="absolute top-[65px] left-0 right-0 z-40 bg-[#0F0F12] border-b border-[#1F1F23] shadow-2xl p-4 md:hidden flex flex-col gap-4 animate-in slide-in-from-top duration-200">
+            {/* Quick Navigation Links */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-bold text-zinc-500 tracking-wider uppercase px-2 mb-1">메뉴 목록</span>
+              <button
+                onClick={() => {
+                  onSelectView('webzine');
+                  setMobileMenuOpen(false);
+                }}
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+                  viewMode === 'webzine'
+                    ? 'bg-[#1F1F23] text-white border border-[#27272A]'
+                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#16161A]'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 text-indigo-400" />
+                <span>파크골프 웹진</span>
+              </button>
+
+              {currentUser && (
+                <>
+                  <button
+                    onClick={() => {
+                      onSelectView('library');
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+                      viewMode === 'library'
+                        ? 'bg-[#1F1F23] text-white border border-[#27272A]'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#16161A]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Layers className="w-4 h-4 text-amber-400" />
+                      <span>내 보관함 & 저장 글</span>
+                    </div>
+                    {savedCount > 0 && (
+                      <span className="px-2 py-0.5 bg-indigo-500 text-white rounded-full text-[10px] font-bold">
+                        {savedCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {isAdmin && (
+                    <button
+                      onClick={() => {
+                        onSelectView('admin');
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold transition ${
+                        viewMode === 'admin'
+                          ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
+                          : 'text-indigo-400 hover:text-indigo-200 hover:bg-indigo-950/20'
+                      }`}
+                    >
+                      <ShieldCheck className="w-4 h-4 text-indigo-300" />
+                      <span>최고 관리자 콘솔</span>
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* AI Custom Action Option */}
+            {currentUser && (
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-bold text-zinc-500 tracking-wider uppercase px-2 mb-1">매거진 편집</span>
+                <button
+                  onClick={() => {
+                    onOpenQuickGenerator();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/20 transition cursor-pointer"
+                >
+                  <PenTool className="w-4 h-4" />
+                  <span>AI 새 글 작성하기</span>
+                </button>
+              </div>
+            )}
+
+            {/* Authentication buttons for mobile */}
+            <div className="flex flex-col gap-1.5 pt-3 border-t border-[#1F1F23]">
+              {currentUser ? (
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3 px-2 py-1">
+                    {currentUser.photoURL ? (
+                      <img
+                        src={currentUser.photoURL}
+                        alt="Profile"
+                        referrerPolicy="no-referrer"
+                        className="w-9 h-9 rounded-full object-cover border border-indigo-500/40"
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-300 text-sm font-bold">
+                        {currentUser.displayName ? currentUser.displayName[0] : 'U'}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-bold text-white truncate">
+                        {currentUser.displayName || '웹진 에디터'}
+                      </div>
+                      <div className="text-xs text-zinc-500 truncate mt-0.5">
+                        {currentUser.email}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      setMobileMenuOpen(false);
+                      await handleLogout();
+                    }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-rose-400 bg-rose-950/10 hover:bg-rose-950/20 border border-rose-900/30 rounded-xl transition cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>로그아웃</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      onOpenAuth('login');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-zinc-300 bg-[#16161A] hover:bg-[#222228] border border-[#27272A] transition"
+                  >
+                    <LogIn className="w-4 h-4 text-indigo-400" />
+                    <span>로그인</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      onOpenAuth('signup');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/50 transition"
+                  >
+                    <UserPlus className="w-4 h-4 text-indigo-300" />
+                    <span>회원가입</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </header>
   );
 };

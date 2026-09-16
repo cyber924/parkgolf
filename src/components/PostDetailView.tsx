@@ -55,6 +55,11 @@ export const PostDetailView: React.FC<PostDetailViewProps> = ({
   const [copiedType, setCopiedType] = useState<'md' | 'html' | 'tags' | null>(null);
   const [fontSize, setFontSize] = useState<FontSizeOption>('normal');
 
+  // Keep editableMarkdown perfectly in sync when the post prop updates
+  React.useEffect(() => {
+    setEditableMarkdown(post.contentMarkdown);
+  }, [post.id, post.contentMarkdown]);
+
   // Image Selection Modal States
   const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
   const [editingContentImg, setEditingContentImg] = useState<{
@@ -101,11 +106,16 @@ export const PostDetailView: React.FC<PostDetailViewProps> = ({
     const matches = [...markdown.matchAll(imgRegex)];
 
     const targetMatch = matches[editingContentImg.index];
-    if (targetMatch) {
-      const oldTag = targetMatch[0];
+    if (targetMatch && typeof targetMatch.index === 'number') {
+      const matchIndex = targetMatch.index;
+      const matchLength = targetMatch[0].length;
       const finalCaption = newCaption !== undefined ? newCaption : targetMatch[1];
       const newTag = `![${finalCaption}](${newUrl})`;
-      markdown = markdown.replace(oldTag, newTag);
+
+      // Precise slicing coordinates bypass any replace() token or duplicate string conflicts
+      const before = markdown.slice(0, matchIndex);
+      const after = markdown.slice(matchIndex + matchLength);
+      markdown = before + newTag + after;
 
       // If caption was edited and there is an italic caption right below it (*▲ ...*), update it too
       const oldCaptionPattern = new RegExp(`\\*▲\\s*${targetMatch[1]}\\*`, 'g');

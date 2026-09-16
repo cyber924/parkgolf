@@ -36,7 +36,7 @@ export const CURATED_GALLERY: CategoryImageCollection[] = [
         tag: '어프로치',
       },
       {
-        url: 'https://images.unsplash.com/photo-1622396636133-ba43f812dd33?auto=format&fit=crop&w=1200&q=80',
+        url: 'https://images.unsplash.com/photo-1628891890377-5712989b1112?auto=format&fit=crop&w=1200&q=80',
         title: '파크골프 라운딩 동반자와 함께하는 필드 워킹',
         tag: '라운딩 라이프',
       },
@@ -46,12 +46,12 @@ export const CURATED_GALLERY: CategoryImageCollection[] = [
         tag: '명문 코스',
       },
       {
-        url: 'https://images.unsplash.com/photo-1510563800743-aed236490d09?auto=format&fit=crop&w=1200&q=80',
+        url: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?auto=format&fit=crop&w=1200&q=80',
         title: '그린 위 롱퍼트 볼 마킹과 브레이크 라이 읽기',
         tag: '퍼팅 레슨',
       },
       {
-        url: 'https://images.unsplash.com/photo-1591491634960-9ba2802611a5?auto=format&fit=crop&w=1200&q=80',
+        url: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?auto=format&fit=crop&w=1200&q=80',
         title: '파크골프 전용 우드 클럽과 파크골프 공 세팅',
         tag: '용품 세팅',
       },

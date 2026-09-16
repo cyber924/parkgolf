@@ -16,6 +16,12 @@ service cloud.firestore {
       allow write: if true;
     }
 
+    // Shared images collection
+    match /shared_images/{imageId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     // User bookmarks and likes
     match /bookmarks/{bookmarkId} {
       allow read, write: if request.auth != null;

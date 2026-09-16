@@ -210,7 +210,7 @@ export const INITIAL_POSTS: BlogPost[] = [
 
 ## 3. 10분 초간단 배수구 냄새 제거 실전 단계
 
-![주방 싱크대 배수구 세정 과정](https://picsum.photos/seed/sinkclean1/800/450)
+![주방 싱크대 배수구 세정 과정](https://images.unsplash.com/photo-1607472586893-edb5ca094e5d?auto=format&fit=crop&w=800&q=80)
 *▲ 베이킹소다와 구연산수가 반응하여 배관 내벽의 유기물 찌꺼기를 분해하는 과정*
 
 1. **배수구 거름망 분리:** 거름망과 덮개를 분리하여 싱크대 한쪽에 둡니다.
@@ -223,7 +223,7 @@ export const INITIAL_POSTS: BlogPost[] = [
 
 ## 4. 번쩍번쩍 수전 물때 청소 시크릿 팁
 
-![반짝이는 스테인리스 수전 광택](https://picsum.photos/seed/faucetclean2/800/450)
+![반짝이는 스테인리스 수전 광택](https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80)
 *▲ 구연산 팩 요법으로 호텔 욕실처럼 광택을 되찾은 주방 수전*
 
 수전에 허옇게 끼는 물때는 수돗물 속 **칼슘과 마그네슘** 성분이 굳어진 것입니다.
@@ -301,7 +301,7 @@ export const INITIAL_POSTS: BlogPost[] = [
 
 ## 2. 필수 구매 추천 멀티 식재료 6가지
 
-![신선한 제철 식재료 장보기](https://picsum.photos/seed/grocerymarket1/800/450)
+![신선한 제철 식재료 장보기](https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80)
 *▲ 1주일 5만원 예산으로 건강한 식단을 완성하는 가성비 멀티 식재료 구성*
 
 1. **계란 1판 (30구):** 볶음밥, 계란말이, 국거리, 삶은 계란 등 단백질 최고의 가성비.
@@ -315,7 +315,7 @@ export const INITIAL_POSTS: BlogPost[] = [
 
 ## 3. 월~금 5일 완성 간편 식단표
 
-![소분 보관과 밀폐용기 라벨링](https://picsum.photos/seed/mealprepbox2/800/450)
+![소분 보관과 밀폐용기 라벨링](https://images.unsplash.com/photo-1606787366850-de6330128bfc?auto=format&fit=crop&w=800&q=80)
 *▲ 주말 20분 소분 밀폐 보관으로 평일 저녁 조리시간을 10분으로 단축하는 노하우*
 
 | 요일 | 메인 메뉴 | 10분 완성 포인트 |
@@ -392,7 +392,7 @@ export const INITIAL_POSTS: BlogPost[] = [
 
 ## 2. 연령/소득별 환급 비율 비교표
 
-![대중교통 지하철 및 버스 탑승](https://picsum.photos/seed/subwaycommute1/800/450)
+![대중교통 지하철 및 버스 탑승](https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80)
 *▲ K-패스 환급으로 대중교통 교통비를 최대 53% 절약하는 직장인 및 청년 혜택*
 
 | 구분 | 대상 | 환급 비율 | 월 8만원 지출 시 환급액 |
@@ -407,7 +407,7 @@ export const INITIAL_POSTS: BlogPost[] = [
 
 ## 3. 3단계 초간단 신청 및 카드 발급 가이드
 
-![모바일 K-패스 앱 등록 및 카드 사용](https://picsum.photos/seed/smartpaycard2/800/450)
+![모바일 K-패스 앱 등록 및 카드 사용](https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=800&q=80)
 *▲ 전용 앱에 카드 16자리를 등록하여 바로 시작하는 원클릭 교통비 환급 루틴*
 
 1. **K-패스 전용 제휴 카드 발급:** 신한, 국민, 삼성, 우리, 하나, 농협, BC, 케이뱅크, 카카오페이 등 원하는 카드사에서 신용/체크카드 발급.

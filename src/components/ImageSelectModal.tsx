@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Image as ImageIcon,
@@ -8,8 +8,12 @@ import {
   Sparkles,
   Search,
   Filter,
+  Database,
+  RefreshCw,
 } from 'lucide-react';
 import { CURATED_GALLERY, CuratedImageItem } from '../data/curatedImages';
+import { fetchSharedImages } from '../lib/firestoreService';
+import { SharedImage } from '../types';
 
 interface ImageSelectModalProps {
   isOpen: boolean;
@@ -34,12 +38,32 @@ export const ImageSelectModal: React.FC<ImageSelectModalProps> = ({
   allowCaptionEdit = false,
   onSelect,
 }) => {
-  const [activeTab, setActiveTab] = useState<'gallery' | 'custom' | 'upload'>('gallery');
+  const [activeTab, setActiveTab] = useState<'db' | 'gallery' | 'custom' | 'upload'>('db');
   const [selectedUrl, setSelectedUrl] = useState<string>(currentImageUrl);
   const [captionText, setCaptionText] = useState<string>(currentCaption);
   const [customUrlInput, setCustomUrlInput] = useState<string>('');
   const [searchFilter, setSearchFilter] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>(category || 'golf');
+  const [dbImages, setDbImages] = useState<SharedImage[]>([]);
+  const [isLoadingDb, setIsLoadingDb] = useState<boolean>(false);
+
+  const loadDbImages = async () => {
+    setIsLoadingDb(true);
+    try {
+      const data = await fetchSharedImages();
+      setDbImages(data);
+    } catch (err) {
+      console.error('Error fetching shared images in modal:', err);
+    } finally {
+      setIsLoadingDb(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      loadDbImages();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -107,22 +131,40 @@ export const ImageSelectModal: React.FC<ImageSelectModalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 px-6 pt-4 border-b border-[#1F1F23] bg-[#121215] shrink-0">
+        <div className="flex items-center gap-2 px-6 pt-4 border-b border-[#1F1F23] bg-[#121215] shrink-0 overflow-x-auto">
           <button
-            onClick={() => setActiveTab('gallery')}
-            className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition flex items-center gap-1.5 cursor-pointer ${
+            onClick={() => {
+              setActiveTab('db');
+              setSearchFilter('');
+            }}
+            className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              activeTab === 'db'
+                ? 'border-indigo-500 text-indigo-400'
+                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <Database className="w-4 h-4" />
+            <span>AI 이미지 보관함 (DB 에셋)</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveTab('gallery');
+              setSearchFilter('');
+            }}
+            className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'gallery'
                 ? 'border-indigo-500 text-indigo-400'
                 : 'border-transparent text-zinc-400 hover:text-zinc-200'
             }`}
           >
             <Sparkles className="w-4 h-4" />
-            <span>고화질 갤러리에서 선택</span>
+            <span>고화질 추천 갤러리</span>
           </button>
 
           <button
             onClick={() => setActiveTab('upload')}
-            className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition flex items-center gap-1.5 cursor-pointer ${
+            className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'upload'
                 ? 'border-indigo-500 text-indigo-400'
                 : 'border-transparent text-zinc-400 hover:text-zinc-200'
@@ -134,7 +176,7 @@ export const ImageSelectModal: React.FC<ImageSelectModalProps> = ({
 
           <button
             onClick={() => setActiveTab('custom')}
-            className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition flex items-center gap-1.5 cursor-pointer ${
+            className={`pb-3 px-3 text-xs sm:text-sm font-bold border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
               activeTab === 'custom'
                 ? 'border-indigo-500 text-indigo-400'
                 : 'border-transparent text-zinc-400 hover:text-zinc-200'
@@ -147,6 +189,109 @@ export const ImageSelectModal: React.FC<ImageSelectModalProps> = ({
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
+          {/* TAB 0: DB-STORED AI IMAGES */}
+          {activeTab === 'db' && (
+            <div className="space-y-4">
+              {/* Search & Refresh */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="relative flex-1">
+                  <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchFilter}
+                    onChange={(e) => setSearchFilter(e.target.value)}
+                    placeholder="보관함 내 이미지 제목 또는 프롬프트 검색..."
+                    className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#18181D] border border-[#27272A] rounded-xl text-white placeholder-zinc-500 focus:outline-hidden focus:border-indigo-500"
+                  />
+                </div>
+                <button
+                  onClick={loadDbImages}
+                  disabled={isLoadingDb}
+                  className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer shrink-0 disabled:opacity-50"
+                  title="새로고침"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isLoadingDb ? 'animate-spin' : ''}`} />
+                  <span>동기화</span>
+                </button>
+              </div>
+
+              {isLoadingDb ? (
+                <div className="py-20 text-center space-y-2">
+                  <RefreshCw className="w-7 h-7 animate-spin text-indigo-500 mx-auto" />
+                  <p className="text-xs text-zinc-400">데이터베이스에서 이미지 에셋을 불러오는 중...</p>
+                </div>
+              ) : dbImages.length === 0 ? (
+                <div className="py-16 text-center border-2 border-dashed border-[#27272A] rounded-2xl">
+                  <Database className="w-7 h-7 text-zinc-600 mx-auto mb-2" />
+                  <p className="text-xs text-zinc-400 font-bold">보관함에 저장된 이미지 에셋이 없습니다.</p>
+                  <p className="text-[10px] text-zinc-500 mt-1">
+                    관리자 도구의 '이미지 에셋' 탭에서 나만의 AI 명품 에셋을 먼저 생성해보세요!
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 max-h-[340px] overflow-y-auto pr-1">
+                  {dbImages
+                    .filter((img) => {
+                      if (!searchFilter.trim()) return true;
+                      return (
+                        img.title.toLowerCase().includes(searchFilter.toLowerCase()) ||
+                        img.prompt.toLowerCase().includes(searchFilter.toLowerCase())
+                      );
+                    })
+                    .map((img) => {
+                      const isSelected = selectedUrl === img.url;
+                      return (
+                        <div
+                          key={img.id}
+                          onClick={() => {
+                            setSelectedUrl(img.url);
+                            if (!captionText && allowCaptionEdit) {
+                              setCaptionText(img.title);
+                            }
+                          }}
+                          className={`group relative rounded-2xl overflow-hidden aspect-16/10 cursor-pointer border-2 transition-all ${
+                            isSelected
+                              ? 'border-indigo-500 ring-2 ring-indigo-500/40 shadow-lg'
+                              : 'border-[#27272A] hover:border-zinc-500 opacity-80 hover:opacity-100'
+                          }`}
+                        >
+                          <img
+                            src={img.url}
+                            alt={img.title}
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+
+                          {/* Selected checkmark */}
+                          {isSelected && (
+                            <div className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-md">
+                              <Check className="w-3.5 h-3.5 stroke-[3]" />
+                            </div>
+                          )}
+
+                          {/* Size Badge */}
+                          <span className="absolute top-2 left-2 z-10 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-mono font-bold text-zinc-300">
+                            {img.sizeKB} KB
+                          </span>
+
+                          {/* Tag & Title */}
+                          <div className="absolute bottom-2 left-2 right-2 text-white text-left">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-900/80 font-bold text-indigo-200 mb-1 inline-block uppercase tracking-wider">
+                              {img.theme === 'golf' ? '파크골프' : img.theme}
+                            </span>
+                            <div className="text-xs font-bold line-clamp-1 drop-shadow-sm">
+                              {img.title}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* TAB 1: CURATED GALLERY */}
           {activeTab === 'gallery' && (
             <div className="space-y-4">

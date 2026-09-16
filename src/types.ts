@@ -120,5 +120,16 @@ export interface AppUser {
   bio?: string;
 }
 
+export interface SharedImage {
+  id: string;
+  url: string;
+  prompt: string;
+  theme: string;
+  title: string;
+  sizeKB: number;
+  createdAt: string;
+  createdBy: string;
+}
+
 export type ViewMode = 'webzine' | 'generator' | 'detail' | 'library' | 'admin';
 

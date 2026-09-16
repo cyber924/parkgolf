@@ -42,6 +42,7 @@ import {
   deleteUserFromFirestore,
   ADMIN_EMAILS,
 } from '../lib/adminService';
+import { AdminImageAssets } from './AdminImageAssets';
 
 interface AdminViewProps {
   posts: BlogPost[];
@@ -62,7 +63,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   onNavigateToWebzine,
   onOpenAuth,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'system'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'images' | 'system'>('overview');
   const [users, setUsers] = useState<AppUser[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
@@ -269,6 +270,18 @@ export const AdminView: React.FC<AdminViewProps> = ({
               <span className="px-1.5 py-0.2 bg-zinc-700 text-zinc-200 rounded-full text-[10px] font-bold">
                 {users.length}
               </span>
+            </button>
+            <button
+              id="admin-tab-images"
+              onClick={() => setActiveTab('images')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer ${
+                activeTab === 'images'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                  : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              <Layers className="w-4 h-4 text-amber-400" />
+              <span>이미지 에셋</span>
             </button>
             <button
               id="admin-tab-system"
@@ -787,7 +800,14 @@ export const AdminView: React.FC<AdminViewProps> = ({
       )}
 
       {/* ======================================================== */}
-      {/* TAB 3: SYSTEM ENGINE & MONITORING */}
+      {/* TAB 3: IMAGE ASSETS & AI GENERATOR */}
+      {/* ======================================================== */}
+      {activeTab === 'images' && (
+        <AdminImageAssets currentUser={currentUser} showToast={showToast} />
+      )}
+
+      {/* ======================================================== */}
+      {/* TAB 4: SYSTEM ENGINE & MONITORING */}
       {/* ======================================================== */}
       {activeTab === 'system' && (
         <div className="space-y-6 animate-in fade-in">

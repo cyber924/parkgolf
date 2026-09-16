@@ -908,3 +908,163 @@ app.post('/api/blog/regenerate-images', async (req, res) => {
     });
   }
 });
+
+// API: Generate image with Gemini AI or high-quality curated fallback
+app.post('/api/blog/generate-image', async (req, res) => {
+  try {
+    const { prompt, theme = 'golf' } = req.body;
+
+    if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+      return res.status(400).json({ success: false, error: '프롬프트를 입력해주세요.' });
+    }
+
+    console.log(`Generating image for prompt: "${prompt}", theme: ${theme}`);
+
+    // Try Gemini image generation if key is present
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const ai = getAIClient();
+        const response = await ai.models.generateContent({
+          model: 'gemini-3.1-flash-lite-image',
+          contents: {
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+          config: {
+            imageConfig: {
+              aspectRatio: '4:3',
+            },
+          },
+        });
+
+        if (response?.candidates?.[0]?.content?.parts) {
+          for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData) {
+              const mimeType = part.inlineData.mimeType || 'image/png';
+              const base64Data = part.inlineData.data;
+              return res.json({
+                success: true,
+                imageUrl: `data:${mimeType};base64,${base64Data}`,
+                source: 'gemini-ai'
+              });
+            }
+          }
+        }
+      } catch (geminiErr: any) {
+        console.warn('Gemini image generation failed, using high-quality curated fallback:', geminiErr.message || geminiErr);
+      }
+    }
+
+    // High-quality fallback: Select from CURATED_CATEGORY_PHOTOS
+    const catList = CURATED_CATEGORY_PHOTOS[theme] || CURATED_CATEGORY_PHOTOS.golf;
+    let hash = 0;
+    for (let i = 0; i < prompt.length; i++) {
+      hash = (hash << 5) - hash + prompt.charCodeAt(i);
+      hash |= 0;
+    }
+    const index = Math.abs(hash) % catList.length;
+    const fallbackUrl = catList[index];
+
+    // Fetch the fallback image on the server and return it as a base64 DataURL
+    try {
+      const imgRes = await fetch(fallbackUrl);
+      if (imgRes.ok) {
+        const arrayBuffer = await imgRes.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const mimeType = imgRes.headers.get('content-type') || 'image/jpeg';
+        const base64Data = buffer.toString('base64');
+        return res.json({
+          success: true,
+          imageUrl: `data:${mimeType};base64,${base64Data}`,
+          source: 'curated-fallback',
+          originalUrl: fallbackUrl
+        });
+      }
+    } catch (fetchErr) {
+      console.error('Failed to fetch fallback image as base64, returning direct URL:', fetchErr);
+    }
+
+    res.json({
+      success: true,
+      imageUrl: fallbackUrl,
+      source: 'curated-fallback-url'
+    });
+
+  } catch (error: any) {
+    console.error('Image generation main loop error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || '이미지 생성 중 오류가 발생했습니다.'
+    });
+  }
+});
+
+// Direct SEO Endpoints: robots.txt & sitemap.xml
+app.get('/robots.txt', (_req, res) => {
+  res.type('text/plain');
+  res.send(`User-agent: *
+Allow: /
+
+# Sitemap Index for Google Search Console & Naver Search Advisor
+Sitemap: https://parkgolfone.co.kr/sitemap.xml
+`);
+});
+
+app.get('/sitemap.xml', (_req, res) => {
+  res.type('application/xml');
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://parkgolfone.co.kr/</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://parkgolfone.co.kr/?cat=golf</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://parkgolfone.co.kr/?cat=sports</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://parkgolfone.co.kr/?cat=health</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://parkgolfone.co.kr/?cat=news</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://parkgolfone.co.kr/?cat=travel</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://parkgolfone.co.kr/?cat=cooking</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://parkgolfone.co.kr/?cat=finance</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>`);
+});
+
